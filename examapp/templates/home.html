@@ -1,12 +1,80 @@
 <!DOCTYPE html>
-<html lang="en">
+{% load static %}
+<html lang="en" xmlns="http://www.w3.org/1999/html">
 <head>
     <meta charset="UTF-8">
     <title>{% block title %}Главная{% endblock %}</title>
+    <link rel="icon" href="{% static 'images/Icon.JPG' %}">
+    <link rel="stylesheet" href="{% static 'uikit/css/uikit.css' %}">
+    <script src="{% static 'uikit/js/uikit.js' %}"></script>
 </head>
 <body>
 {% block content %}
+{% if messages %}
+<div class="uk-margin-bottom uk-width-1-5">
+    {% for message in messages %}
+    <div class="
+        {% if message.tags == 'error' %}uk-alert-danger
+        {% elif message.tags == 'warning' %}uk-alert-warning
+        {% elif message.tags == 'success' %}uk-alert-success
+        {% elif message.tags == 'info' %}uk-alert-primary
+        {% else %}uk-alert-primary{% endif %}"
+        uk-alert>
+        <a class="uk-alert-close" uk-close></a>
+        <h4 class="uk-margin-small-bottom">
+            {% if message.tags == 'error' %}
+            <span uk-icon="icon: warning"></span> Ошибка
+            {% elif message.tags == 'warning' %}
+            <span uk-icon="icon: bell"></span> Внимание
+            {% elif message.tags == 'success' %}
+            <span uk-icon="icon: check"></span> Успешно
+            {% else %}
+            <span uk-icon="icon: info"></span> Информация
+            {% endif %}
+        </h4>
+        <p>{{ message }}</p>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+<div class="uk-margin-left">
+    <h2 class="uk-heading">Список товаров</h2>
+    <a class="uk-button uk-button-primary" href="{% url 'logout' %}">Выйти</a>
+    {% for product in products %}
+<div class="uk-card uk-margin-bottom">
+    <div class="uk-card-body">
+    <div class="uk-grid-small uk-flex uk-flex-left" uk-grid>
+        <div class="uk-width-auto">
+            <div class="uk-flex uk-flex-center uk-flex-middle" style="height: 100%;">
+                <img src="{% static 'images'%}/{{product.image}}"
+                     width="200">
+            </div>
+        </div>
+        <div class="uk-width-auto">
+            <div><strong>{{ product.category.name }} | {{ product.product }}</strong></div>
+            <div><strong>Описание товара:</strong> {{product.description}}</div>
+            <div><strong>Производитель:</strong> {{product.manufacturer.name}}</div>
+            <div><strong>Поставщик:</strong> {{product.producer.name}}</div>
+            {% if product.discount > 0 %}
+            <div> <strong>Цена:</strong> <s style="color: red">{{ product.price }} Р</s> | {{ product.get_final_price|floatformat:2 }} Р
+            </div>
+            {% else %}
+            <div><strong>Цена:</strong> {{product.price}} Р</div>
+            {% endif %}
+            <div><strong>Единица измерения:</strong> {{product.unit}}</div>
+            <div style="{% if product.amount_on_warehouse == 0 %}background-color: #00bfff;{% endif %}"><strong>Количество на складе:</strong> {{product.amount_on_warehouse}}</div>
+        </div>
+        <div class="uk-width-auto uk-flex uk-flex-center uk-flex-middle">
+            <div class="uk-text-center" style="{% if product.discount > 15 %}background-color: #2E8B57;{% endif %}">
+                <div>Действующая скидка</div>
+                <div>{{product.discount}}%</div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+</div>
+</div>
 {% endblock %}
-<a href="{% url 'logout' %}">Выйти</a>
 </body>
 </html>

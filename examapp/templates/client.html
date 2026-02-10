@@ -3,5 +3,6 @@
 {% block title %}Страница клиента{% endblock %}
 
 {% block content %}
-<h3>Клиент {{user.first_name}}</h3>
+<h3 class="uk-margin-left">Клиент {{user.first_name}}</h3>
+{{ block.super }}
 {% endblock %}

@@ -35,6 +35,11 @@ class Product(models.Model):
     description = models.CharField(max_length=255)
     image = models.ImageField()
 
+    def get_final_price(self):
+        if self.discount > 0:
+            return self.price * (100 - self.discount) / 100
+        return self.price
+
 class Order(models.Model):
     number_order = models.DecimalField(max_digits=10, decimal_places=2)
     arcticle = models.CharField(max_length=255)

@@ -19,7 +19,10 @@ from django.urls import path
 from examapp import views
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', views.home_view,  name="home"),
-    path('login/', views.login_view, name="login"),
+    path('home/', views.home_view,  name="home"),
+    path('client/', views.client, name='client'),
+    path('manager/', views.manager, name='manager'),
+    path('admin-panel/', views.admin, name='admin'),
+    path('', views.login_view, name="login"),
     path('logout/', views.logout_view, name="logout")
 ]

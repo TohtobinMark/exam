@@ -1,19 +1,55 @@
 <!DOCTYPE html>
+{% load static %}
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Вход</title>
+    <link rel="stylesheet" href="{% static 'uikit/css/uikit.css' %}">
+    <script src="{% static 'uikit/js/uikit.js' %}"></script>
 </head>
 <body>
-{% if error %}
-<p>{{ error}} </p>
+<div class="uk-height-viewport uk-flex uk-flex-center uk-flex-middle">
+    <div class="uk-width-large uk-card uk-card-default uk-card-body uk-margin-xlarge-bottom">
+{% if messages %}
+<div class="uk-margin-bottom ">
+    {% for message in messages %}
+    <div class="
+        {% if message.tags == 'error' %}uk-alert-danger
+        {% elif message.tags == 'warning' %}uk-alert-warning
+        {% elif message.tags == 'success' %}uk-alert-success
+        {% elif message.tags == 'info' %}uk-alert-primary
+        {% else %}uk-alert-primary{% endif %}"
+        uk-alert>
+        <a class="uk-alert-close" uk-close></a>
+        <h4 class="uk-margin-small-bottom">
+            {% if message.tags == 'error' %}
+            <span uk-icon="icon: warning"></span> Ошибка
+            {% elif message.tags == 'warning' %}
+            <span uk-icon="icon: bell"></span> Внимание
+            {% elif message.tags == 'success' %}
+            <span uk-icon="icon: check"></span> Успешно
+            {% else %}
+            <span uk-icon="icon: info"></span> Информация
+            {% endif %}
+        </h4>
+        <p>{{ message }}</p>
+    </div>
+    {% endfor %}
+</div>
 {% endif %}
-<form method="post">
+<form class="uk-form" method="post">
     {% csrf_token %}
-    <h3>Авторизация</h3>
-    <input type="text" name="username" placeholder="Логин">
-    <input type="password" name="password" placeholder="Логин">
-    <button type="submit">Войти</button>
+    <h3 class="uk-text-center">Авторизация</h3>
+    <div class="uk-width-auto">
+        <input class="uk-input" type="text" name="username" placeholder="Логин">
+        <input class="uk-input" type="text" name="password" placeholder="Пароль">
+    </div>
+    <div class="uk-margin uk-text-center">
+        <button class="uk-button uk-button-primary" type="submit">Войти</button>
+        <a class="uk-button" href="{% url 'home' %}">Режим гостя</a>
+    </div>
 </form>
+    </div>
+</div>
 </body>
 </html>
