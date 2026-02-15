@@ -1,0 +1,53 @@
+    <div class="uk-card uk-card-default uk-card-body uk-margin-bottom">
+        <form method="get" action="">
+            <div class="uk-grid-small" uk-grid>
+                <input type="hidden" name="sort" value="{{ current_sort }}">
+                <div class="uk-width-expand">
+                    <div class="uk-inline uk-width-1-1">
+                        <span class="uk-form-icon" uk-icon="icon: search"></span>
+                        <input class="uk-input" type="text" name="search"
+                               placeholder="Поиск товара"
+                               value="{{ search_query }}">
+                    </div>
+                </div>
+
+                <div class="uk-width-1-4">
+                    <select class="uk-select" name="category" onchange="this.form.submit()">
+                        <option value="">Все категории</option>
+                        {% for category in categories %}
+                        <option value="{{ category.id }}" {% if current_category == category.id|stringformat:"s" %}selected{% endif %}>
+                            {{ category.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="uk-width-auto">
+                    <button class="uk-button uk-button-primary" type="submit">
+                        <span uk-icon="icon: search"></span> Найти
+                    </button>
+                </div>
+
+                {% if search_query or current_category or current_sort %}
+                <div class="uk-width-auto">
+                    <a href="?" class="uk-button uk-button-danger">
+                        <span uk-icon="icon: close"></span> Сбросить
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </form>
+
+        <div class="uk-margin-top">
+            <div class="uk-button-group uk-margin-left">
+                <a href="?{% if search_query %}search={{ search_query }}&{% endif %}{% if current_category %}category={{ current_category }}&{% endif %}sort=amount_asc"
+                   class="uk-button uk-button-default {% if current_sort == 'amount_asc' %}uk-button-primary{% endif %}">
+                    <span uk-icon="icon: arrow-up"></span> По возрастанию
+                </a>
+                <a href="?{% if search_query %}search={{ search_query }}&{% endif %}{% if current_category %}category={{ current_category }}&{% endif %}sort=amount_desc"
+                   class="uk-button uk-button-default {% if current_sort == 'amount_desc' %}uk-button-primary{% endif %}">
+                    <span uk-icon="icon: arrow-down"></span> По убыванию
+                </a>
+            </div>
+        </div>
+    </div>

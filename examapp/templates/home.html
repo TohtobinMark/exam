@@ -7,11 +7,12 @@
     <link rel="icon" href="{% static 'images/Icon.JPG' %}">
     <link rel="stylesheet" href="{% static 'uikit/css/uikit.css' %}">
     <script src="{% static 'uikit/js/uikit.js' %}"></script>
+    <script src="{% static 'uikit/js/uikit-icons.min.js' %}"></script>
 </head>
 <body>
 {% block content %}
 {% if messages %}
-<div class="uk-margin-bottom uk-width-1-5">
+<div class="uk-margin-left uk-margin-bottom uk-width-1-5">
     {% for message in messages %}
     <div class="
         {% if message.tags == 'error' %}uk-alert-danger

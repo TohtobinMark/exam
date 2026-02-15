@@ -4,5 +4,6 @@
 
 {% block content %}
 <h3 class="uk-margin-left">Администратор {{user.first_name}}</h3>
+{% include "search.html" %}
 {{ block.super }}
 {% endblock %}

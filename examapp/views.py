@@ -1,7 +1,8 @@
+from django.db.models import Q
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
-from .models import Product
+from .models import Product, CategoryProduct
 import logging
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
@@ -41,21 +42,61 @@ def client(request):
         messages.error(request, "Произошла ошибка при загрузке данных.")
         return render(request, "client.html", {'products': []})
 
-@login_required
-def manager(request):
+
+def get_filtered_products(request):
+    search_query = request.GET.get('search', '')
+    sort_by = request.GET.get('sort', '')
+    category_id = request.GET.get('category', '')
+
+    products = Product.objects.all().select_related('producer', 'manufacturer', 'category')
+
+    if search_query:
+        products = products.filter(
+            Q(product__icontains=search_query) |
+            Q(article__icontains=search_query) |
+            Q(description__icontains=search_query) |
+            Q(producer__name__icontains=search_query) |
+            Q(manufacturer__name__icontains=search_query)
+        )
+
+    if category_id:
+        products = products.filter(category_id=category_id)
+
+    if sort_by == 'amount_asc':
+        products = products.order_by('amount_on_warehouse')
+    elif sort_by == 'amount_desc':
+        products = products.order_by('-amount_on_warehouse')
+
+    categories = CategoryProduct.objects.all()
+
+    return {
+        'products': products,
+        'search_query': search_query,
+        'current_sort': sort_by,
+        'current_category': category_id,
+        'categories': categories,
+        'total_products': products.count()
+    }
+
+def handle_welcome_message(request):
     if request.session.get('show_welcome_message'):
         username = request.session.get('username', '')
         messages.success(request, f"Добро пожаловать, {username}!")
-    products = Product.objects.all()
-    return render(request, "manager.html", {'products': products})
+        del request.session['show_welcome_message']
+        if 'username' in request.session:
+            del request.session['username']
+
+@login_required
+def manager(request):
+    handle_welcome_message(request)
+    context = get_filtered_products(request)
+    return render(request, "manager.html", context)
 
 @login_required
 def admin(request):
-    if request.session.get('show_welcome_message'):
-        username = request.session.get('username', '')
-        messages.success(request, f"Добро пожаловать, {username}!")
-    products = Product.objects.all()
-    return render(request, "admin.html", {'products': products})
+    handle_welcome_message(request)
+    context = get_filtered_products(request)
+    return render(request, "admin.html", context)
 
 def login_view(request):
     if request.session.get('show_logout_message'):
