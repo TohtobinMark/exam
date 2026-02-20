@@ -1,7 +1,7 @@
     <div class="uk-card uk-card-default uk-card-body uk-margin-bottom">
         <form method="get" action="">
             <div class="uk-grid-small" uk-grid>
-                <input type="hidden" name="sort" value="{{ current_sort }}">
+                <input type="hidden" name="sort" value="{{ current_sort }}" oninput="debounceSubmit(this)">
                 <div class="uk-width-expand">
                     <div class="uk-inline uk-width-1-1">
                         <span class="uk-form-icon" uk-icon="icon: search"></span>
@@ -10,13 +10,21 @@
                                value="{{ search_query }}">
                     </div>
                 </div>
-
+<script>
+let timer;
+function debounceSubmit(input) {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+        input.form.submit();
+    }, 500); // Задержка в миллисекундах
+}
+</script>
                 <div class="uk-width-1-4">
-                    <select class="uk-select" name="category" onchange="this.form.submit()">
-                        <option value="">Все категории</option>
-                        {% for category in categories %}
-                        <option value="{{ category.id }}" {% if current_category == category.id|stringformat:"s" %}selected{% endif %}>
-                            {{ category.name }}
+                    <select class="uk-select" name="producer" onchange="this.form.submit()">
+                        <option value="">Все поставщики</option>
+                        {% for producer in producers %}
+                        <option value="{{ producer.id }}" {% if current_producer == producer.id|slugify %}selected{% endif %}>
+                            {{ producer.name }}
                         </option>
                         {% endfor %}
                     </select>
@@ -28,7 +36,7 @@
                     </button>
                 </div>
 
-                {% if search_query or current_category or current_sort %}
+                {% if search_query or current_producer or current_sort %}
                 <div class="uk-width-auto">
                     <a href="?" class="uk-button uk-button-danger">
                         <span uk-icon="icon: close"></span> Сбросить
@@ -39,12 +47,12 @@
         </form>
 
         <div class="uk-margin-top">
-            <div class="uk-button-group uk-margin-left">
-                <a href="?{% if search_query %}search={{ search_query }}&{% endif %}{% if current_category %}category={{ current_category }}&{% endif %}sort=amount_asc"
+            <div class="uk-button-group">
+                <a href="?{% if search_query %}search={{ search_query }}&{% endif %}{% if current_producer %}producer={{ current_producer }}&{% endif %}sort=amount_asc"
                    class="uk-button uk-button-default {% if current_sort == 'amount_asc' %}uk-button-primary{% endif %}">
                     <span uk-icon="icon: arrow-up"></span> По возрастанию
                 </a>
-                <a href="?{% if search_query %}search={{ search_query }}&{% endif %}{% if current_category %}category={{ current_category }}&{% endif %}sort=amount_desc"
+                <a href="?{% if search_query %}search={{ search_query }}&{% endif %}{% if current_producer %}producer={{ current_producer }}&{% endif %}sort=amount_desc"
                    class="uk-button uk-button-default {% if current_sort == 'amount_desc' %}uk-button-primary{% endif %}">
                     <span uk-icon="icon: arrow-down"></span> По убыванию
                 </a>

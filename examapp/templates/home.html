@@ -48,7 +48,7 @@
         <div class="uk-width-auto">
             <div class="uk-flex uk-flex-center uk-flex-middle" style="height: 100%;">
                 <img src="{% static 'images'%}/{{product.image}}"
-                     width="200">
+                     width="100">
             </div>
         </div>
         <div class="uk-width-auto">
@@ -63,10 +63,12 @@
             <div><strong>Цена:</strong> {{product.price}} Р</div>
             {% endif %}
             <div><strong>Единица измерения:</strong> {{product.unit}}</div>
-            <div style="{% if product.amount_on_warehouse == 0 %}background-color: #00bfff;{% endif %}"><strong>Количество на складе:</strong> {{product.amount_on_warehouse}}</div>
+            <div style="{% if product.amount_on_warehouse == 0 %}background-color: #00bfff;{% endif %}">
+                <strong>Количество на складе:</strong> {{product.amount_on_warehouse}}
+            </div>
         </div>
         <div class="uk-width-auto uk-flex uk-flex-center uk-flex-middle">
-            <div class="uk-text-center" style="{% if product.discount > 15 %}background-color: #2E8B57;{% endif %}">
+            <div class="uk-text-center" style="{% if product.discount > 15 %}background-color: #2E8B57; color: white;{% endif %}">
                 <div>Действующая скидка</div>
                 <div>{{product.discount}}%</div>
             </div>

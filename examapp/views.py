@@ -2,7 +2,7 @@ from django.db.models import Q
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
-from .models import Product, CategoryProduct
+from .models import Product, CategoryProduct, Producer
 import logging
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
@@ -46,7 +46,7 @@ def client(request):
 def get_filtered_products(request):
     search_query = request.GET.get('search', '')
     sort_by = request.GET.get('sort', '')
-    category_id = request.GET.get('category', '')
+    producer_id = request.GET.get('producer', '')
 
     products = Product.objects.all().select_related('producer', 'manufacturer', 'category')
 
@@ -59,22 +59,22 @@ def get_filtered_products(request):
             Q(manufacturer__name__icontains=search_query)
         )
 
-    if category_id:
-        products = products.filter(category_id=category_id)
+    if producer_id:
+        products = products.filter(producer_id=producer_id)
 
     if sort_by == 'amount_asc':
         products = products.order_by('amount_on_warehouse')
     elif sort_by == 'amount_desc':
         products = products.order_by('-amount_on_warehouse')
 
-    categories = CategoryProduct.objects.all()
+    producers = Producer.objects.all()
 
     return {
         'products': products,
         'search_query': search_query,
         'current_sort': sort_by,
-        'current_category': category_id,
-        'categories': categories,
+        'current_producer': producer_id,
+        'producers': producers,
         'total_products': products.count()
     }
 
@@ -124,23 +124,16 @@ def login_view(request):
                            "Пожалуйста, введите ваш пароль.")
             return render(request, "login.html", {'username': username})
 
-        if len(password) < 8:
+        if len(password) < 6:
             messages.warning(request,
                              "Введенный пароль слишком короткий. "
-                             "Минимальная длина пароля - 8 символов.")
+                             "Минимальная длина пароля - 6 символов.")
             return render(request, "login.html", {'username': username})
 
         user = authenticate(request, username=username, password=password)
 
         if user is not None:
             login(request, user)
-            if hasattr(user, 'profile') and user.profile.is_blocked:
-                logout(request)
-                messages.error(request,
-                               "Ваша учетная запись временно заблокирована. "
-                               "Пожалуйста, обратитесь к администратору.")
-                return redirect('login')
-
             request.session['show_welcome_message'] = True
             request.session['username'] = user.get_full_name() or user.username
             logger.info(f"Пользователь {username} успешно вошел в систему")
