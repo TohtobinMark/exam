@@ -1,5 +1,3 @@
-from tkinter.constants import CASCADE
-
 from django.db import models
 from django.contrib.auth.models import User, AbstractUser, Group
 
@@ -33,8 +31,9 @@ class Product(models.Model):
     discount = models.DecimalField(max_digits=10,decimal_places=2)
     amount_on_warehouse = models.DecimalField(max_digits=10, decimal_places=2)
     description = models.CharField(max_length=255)
-    image = models.ImageField()
+    image = models.ImageField(upload_to='media/')
 
+    # Получение стоимости, где включена скидка
     def get_final_price(self):
         if self.discount > 0:
             return self.price * (100 - self.discount) / 100

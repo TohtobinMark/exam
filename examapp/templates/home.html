@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>{% block title %}Главная{% endblock %}</title>
-    <link rel="icon" href="{% static 'images/Icon.JPG' %}">
+    <link rel="icon" href="{% static 'Icon.JPG' %}">
     <link rel="stylesheet" href="{% static 'uikit/css/uikit.css' %}">
     <script src="{% static 'uikit/js/uikit.js' %}"></script>
     <script src="{% static 'uikit/js/uikit-icons.min.js' %}"></script>
@@ -45,12 +45,28 @@
 <div class="uk-card uk-margin-bottom">
     <div class="uk-card-body">
     <div class="uk-grid-small uk-flex uk-flex-left" uk-grid>
-        <div class="uk-width-auto">
+        <!--<div class="uk-width-auto">
             <div class="uk-flex uk-flex-center uk-flex-middle" style="height: 100%;">
                 <img src="{% static 'images'%}/{{product.image}}"
                      width="100">
+
+            </div>
+        </div>-->
+        <div class="uk-width-auto">
+            <div class="uk-flex uk-flex-center uk-flex-middle" style="height: 100%;">
+                <img src="{{ product.image.url }}"
+                     width="200" height="300">
             </div>
         </div>
+        <!--<div class="uk-width-auto">
+    <div class="uk-flex uk-flex-center uk-flex-middle" style="height: 100%;">
+        {% if product.image %}
+            <img src="{{ product.image.url }}" width="100" alt="{{ product.product }}">
+        {% else %}
+            <img src="/static/images/stub.png" width="100" alt="Нет фото">
+        {% endif %}
+    </div>
+        </div>-->
         <div class="uk-width-auto">
             <div><strong>{{ product.category.name }} | {{ product.product }}</strong></div>
             <div><strong>Описание товара:</strong> {{product.description}}</div>
@@ -73,6 +89,12 @@
                 <div>{{product.discount}}%</div>
             </div>
         </div>
+        <form method="post" enctype="multipart/form-data" action="{% url 'upload_product_image' product.id %}">
+            {% csrf_token %}
+            <input type="file" name="image">
+            <button type="submit">Загрузить</button>
+        </form>
+    </div>
     </div>
 </div>
 {% endfor %}

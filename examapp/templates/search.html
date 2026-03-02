@@ -1,26 +1,43 @@
     <div class="uk-card uk-card-default uk-card-body uk-margin-bottom">
         <form method="get" action="">
             <div class="uk-grid-small" uk-grid>
-                <input type="hidden" name="sort" value="{{ current_sort }}" oninput="debounceSubmit(this)">
+                <input type="hidden" name="sort" value="{{ current_sort }}">
                 <div class="uk-width-expand">
                     <div class="uk-inline uk-width-1-1">
                         <span class="uk-form-icon" uk-icon="icon: search"></span>
                         <input class="uk-input" type="text" name="search"
                                placeholder="Поиск товара"
-                               value="{{ search_query }}">
+                               value="{{ search_query }}" id="search_java">
                     </div>
+                    <div id="results"></div>
                 </div>
-<script>
-let timer;
-function debounceSubmit(input) {
-    clearTimeout(timer);
-    timer = setTimeout(() => {
-        input.form.submit();
-    }, 500); // Задержка в миллисекундах
-}
-</script>
+                <script/>
+                        const searchBox = document.getElementById('search-box');
+const resultsDiv = document.getElementById('results');
+
+searchBox.addEventListener('input', async (e) => {
+    const q = e.target.value;
+
+    if (q.length > 0) {
+        try {
+            const response = await fetch(`/search/?q=${q}`);
+            const data = await response.json();
+
+            // Очистка и отрисовка результатов
+            resultsDiv.innerHTML = data.map(item =>
+                `<div>${item.name}</div>`
+            ).join('');
+        } catch (error) {
+            console.error('Ошибка поиска:', error);
+        }
+    } else {
+        resultsDiv.innerHTML = '';
+    }
+});
+                </script>
+
                 <div class="uk-width-1-4">
-                    <select class="uk-select" name="producer" onchange="this.form.submit()">
+                    <select class="uk-select" name="producer">
                         <option value="">Все поставщики</option>
                         {% for producer in producers %}
                         <option value="{{ producer.id }}" {% if current_producer == producer.id|slugify %}selected{% endif %}>
@@ -48,6 +65,7 @@ function debounceSubmit(input) {
 
         <div class="uk-margin-top">
             <div class="uk-button-group">
+                <!--Меняют цвета в зависимости нажата ли кнопка или нет-->
                 <a href="?{% if search_query %}search={{ search_query }}&{% endif %}{% if current_producer %}producer={{ current_producer }}&{% endif %}sort=amount_asc"
                    class="uk-button uk-button-default {% if current_sort == 'amount_asc' %}uk-button-primary{% endif %}">
                     <span uk-icon="icon: arrow-up"></span> По возрастанию
@@ -58,4 +76,3 @@ function debounceSubmit(input) {
                 </a>
             </div>
         </div>
-    </div>

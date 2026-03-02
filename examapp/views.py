@@ -1,11 +1,12 @@
 from django.db.models import Q
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
-from .models import Product, CategoryProduct, Producer
+from .models import Product, Producer
 import logging
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
+from django.http import JsonResponse
 logger = logging.getLogger(__name__)
 
 
@@ -78,6 +79,24 @@ def get_filtered_products(request):
         'total_products': products.count()
     }
 
+def upload_product_image(request, product_id):
+    if request.method == 'POST' and request.FILES.get('image'):
+        product = get_object_or_404(Product, id=product_id)
+        product.image = request.FILES['image']
+        product.save()
+    return redirect('admin')
+
+
+
+def search_view(request):
+    search_query = request.GET.get('search', '')
+    if search_query:
+        results = Product.objects.filter(product__icontains=search_query).values('id', 'product]')[:10]
+        data = list(results)
+    else:
+        data = []
+    return JsonResponse(data, safe=False)
+
 def handle_welcome_message(request):
     if request.session.get('show_welcome_message'):
         username = request.session.get('username', '')
@@ -137,7 +156,7 @@ def login_view(request):
             request.session['show_welcome_message'] = True
             request.session['username'] = user.get_full_name() or user.username
             logger.info(f"Пользователь {username} успешно вошел в систему")
-
+            # Проверяется в какой группе состоит пользователь и если он есть переходит на свою страницу
             if check_group_access(user, "Администратор"):
                 return redirect('admin')
             elif check_group_access(user, "Авторизованный клиент"):
